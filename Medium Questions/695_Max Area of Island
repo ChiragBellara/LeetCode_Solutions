@@ -1,0 +1,38 @@
+from typing import List
+
+
+# DFS based approach
+# The idea is similar to 200. Number of Islands.
+# Instead of simply returing when we encounter a water cell, we return 0
+# as this cell does not add any island area.
+# Hence, when we encounter a cell that is not a water cell, we consider it as the
+# start of an island. We use "count" to count the number of cells this island includes.
+# Every call to dfs will either return the number of cells that will be included in the
+# island that starts at the calling pair of i, j or return 0 if it goes out of bounds
+# or reaches a water cell. We recursively add the values returned and return that at each stage.
+# Finally, we compare it with the current max, and replace the current max if required.
+def maxAreaOfIsland(self, grid: List[List[int]]) -> int:
+    if not grid:
+        return 0
+    m, n = len(grid), len(grid[0])
+
+    def dfs(i, j):
+        if i < 0 or i >= m or j < 0 or j >= n or grid[i][j] == 0:
+            return 0
+
+        grid[i][j] = 0
+        count = 1
+        count += dfs(i + 1, j)
+        count += dfs(i, j + 1)
+        count += dfs(i - 1, j)
+        count += dfs(i, j - 1)
+
+        return count
+
+    maxCount = 0
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == 1:
+                maxCount = max(maxCount, dfs(i, j))
+
+    return maxCount

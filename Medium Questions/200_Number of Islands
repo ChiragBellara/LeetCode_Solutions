@@ -1,0 +1,67 @@
+# DFS Based approach
+# We use DFS to mark the land cells that were visited as a part
+# of the current island as "0" so that we do not count them again.
+# Our base case will be when we either go out of bounds or 
+# encounter a water cell.
+def numIslands(self, grid: List[List[str]]) -> int:
+    islands = 0
+    m, n = len(grid), len(grid[0])
+
+    def dfs(i, j):
+        if i < 0 or i >= m or j < 0 or j >= n or grid[i][j] == "0":
+            return
+
+        grid[i][j] = "0"
+        dfs(i + 1, j)
+        dfs(i, j + 1)
+        dfs(i - 1, j)
+        dfs(i, j - 1)
+
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == "1":
+                dfs(i, j)
+                islands += 1
+
+    return islands
+
+
+# BFS Based approach
+# Similar to DFS, we use BFS to mark the already visited
+# cells of land as "0" to avoid visiting them again.
+# What was our base in DFS approach, becomes our check
+# condition in this approach. We check if a cell satisfies all
+# the conditions, if yes, we add it to the queue and mark
+# it as visited.
+# We also defien a directions array, which contains the step that
+# needs to be taken to advance in all the directions. For each cell
+# that satisfies our base condition, we travel in all 4 directions and check
+# for more cells that satisfy the condition.
+def numIslands(self, grid: List[List[str]]) -> int:
+    if not grid:
+        return 0
+
+    def bfs(i, j):
+        que = collections.deque()
+        directions = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+        que.append((i, j))
+
+        while que:
+            r, c = que.popleft()
+            if 0 <= r < len(grid) \
+                and 0 <= c < len(grid[0]) \
+                and grid[r][c] == "1":
+                grid[r][c] = "0"
+                
+                for dr, dc in directions:
+                    que.append((r + dr, c + dc))
+
+    nrows, ncols = len(grid), len(grid[0])
+    islands = 0
+
+    for i in range(nrows):
+        for j in range(ncols):
+            if grid[i][j] == "1":
+                islands += 1
+                bfs(i, j)
+    return islands
