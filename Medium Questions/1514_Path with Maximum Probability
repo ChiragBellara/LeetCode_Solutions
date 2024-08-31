@@ -1,0 +1,74 @@
+from typing import List
+from collections import deque
+import heapq
+
+
+# Using Bellman Ford Algorithm => We find the maximum probabilites of
+# reaching every node startin from the start_node. We store all these
+# probabilites in a list. In the end, we simply return the probabilty
+# associated with the end_node.
+def maxProbability(
+    self,
+    n: int,
+    edges: List[List[int]],
+    succProb: List[float],
+    start_node: int,
+    end_node: int,
+) -> float:
+
+    adjList = {i: [] for i in range(n)}
+    prob = [0.0] * n
+    dq = deque([start_node])
+
+    for i in range(len(edges)):
+        adjList[edges[i][0]].append([edges[i][1], succProb[i]])
+        adjList[edges[i][1]].append([edges[i][0], succProb[i]])
+
+    prob[start_node] = 1.0
+
+    while dq:
+        curr = dq.popleft()
+        for n1, w1 in adjList[curr]:
+            if prob[curr] * w1 > prob[n1]:
+                prob[n1] = prob[curr] * w1
+                dq.append(n1)
+
+    return prob[end_node]
+
+
+# Using Dijkstra's Algorithm => We run the regular Dijkstra's algorithm
+# but since we have to find maximum probability and Python does not support
+# maxHeap yet, we store the probabilites of with a negative sign. We also store
+# the probability of getting to a node in another list. This will help us compare
+# the values when pushing a new value into the heap.
+# When compared to Bellman Ford, though the space complexity is a bit extra, this
+# algorithm will stop as soon as we find the end_node.
+def maxProbability(
+    self,
+    n: int,
+    edges: List[List[int]],
+    succProb: List[float],
+    start_node: int,
+    end_node: int,
+) -> float:
+    adjList = {i: [] for i in range(n)}
+    prob = [0.0] * n
+
+    for i in range(len(edges)):
+        adjList[edges[i][0]].append([edges[i][1], succProb[i]])
+        adjList[edges[i][1]].append([edges[i][0], succProb[i]])
+
+    prob[start_node] = 1.0
+    minHeap = [[-prob[start_node], start_node]]
+
+    while minHeap:
+        w1, n1 = heapq.heappop(minHeap)
+        if n1 == end_node:
+            return -w1
+
+        for n2, w2 in adjList.get(n1, []):
+            if -w1 * w2 > prob[n2]:
+                prob[n2] = -w1 * w2
+                heapq.heappush(minHeap, [-prob[n2], n2])
+
+    return 0
