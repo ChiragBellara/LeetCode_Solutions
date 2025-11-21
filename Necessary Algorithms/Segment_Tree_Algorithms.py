@@ -41,11 +41,30 @@ def update_tree(idx_to_update, new_value, idx, left, right):
     segment_tree[idx] = segment_tree[2 * idx + 1] + segment_tree[2 * idx + 2]
     return
 
-nums = [3, 1, 2, 7, 1]
+def query(start, end, left, right, idx):
+    # If current segment interval is out of bounds of the required
+    # [start, end] interval.
+    if end < left or start > right:
+        return 0
+    
+    # If current segment interval is a subset of the required
+    # [start, end] interval.
+    if left >= start and right <= end:
+        return segment_tree[idx]
+    
+    # Break the current segment down to further fine-tune the intervals
+    mid = (left + right) // 2
+    return query(start, end, left, mid, 2*idx + 1) + query(start, end, mid + 1, right, 2*idx + 2)
+
+nums = [3, 1, 2, 7, 2, 1, 2, 3]
 segment_tree = [0] * (2 * len(nums))
-build_tree(0, 0, len(nums) - 1)
+build_tree(idx = 0, left = 0, right = len(nums) - 1)
 print(segment_tree)    # [14, 6, 8, 4, 2, 7, 1, 3, 1, 0]
 
 # Update the number at index 1 to the value = 2
-update_tree(1, 2, 0, 0, len(nums) - 1)
+update_tree(idx_to_update = 1, new_value = 2, idx = 0, left = 0, right = len(nums) - 1)
 print(segment_tree)    # [15, 7, 8, 5, 2, 7, 1, 3, 2, 0]
+
+# Query the segment tree to find the sum of all elements in the range [start, end]
+outcome = query(start = 2, end = 6, left = 0, right = len(nums) - 1, idx = 0)
+print(outcome)  # 15
