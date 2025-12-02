@@ -1,12 +1,11 @@
 from threading import Condition
-from collections import deque
 
 def BoundedBlockingQueue(Object):
 
     def __init__(self, capacity: int):
         self.cap = capacity
         self.condition = Condition()
-        self.que = deque(int)
+        self.que = collections.deque()
     
     def enque(self, element: int) -> None:
         self.condition.acquire()
